@@ -4,7 +4,7 @@ using Windows.ApplicationModel;
 
 // inspired by - https://blog.mzikmund.com/2019/11/using-appsettings-json-in-uwp/
 
-namespace UwpAppSettingsJson.Config
+namespace Listener.Config
 {
     public class AppConfig
     {
@@ -26,5 +26,6 @@ namespace UwpAppSettingsJson.Config
         // add each new section to the block
         public Whatsapp Whatsapp => GetSection<Whatsapp>(nameof(Whatsapp));
         public Server Server => GetSection<Server>(nameof(Server));
+        public App App => GetSection<App>(nameof(App));
     }
 }

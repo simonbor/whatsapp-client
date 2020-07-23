@@ -117,10 +117,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Config\AppConfig.cs" />
+    <Compile Include="Config\Sections\App.cs" />
     <Compile Include="Config\Sections\Server.cs" />
     <Compile Include="Config\Sections\Whatsapp.cs" />
     <Compile Include="ConsoleProxy.cs" />
-    <Compile Include="Extensions.cs" />
+    <Compile Include="Helpers.cs" />
+    <Compile Include="Models.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -141,6 +143,9 @@
     </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.2.10</Version>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>11.0.2</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

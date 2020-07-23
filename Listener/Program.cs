@@ -1,38 +1,39 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using Windows.Foundation.Metadata;
 using Windows.UI.Notifications;
 using Windows.UI.Notifications.Management;
 
 // https://blog.pieeatingninjas.be/2018/04/05/creating-a-uwp-console-app-in-c/
-
 namespace Listener
 {
     class Program
     {
         private static readonly UserNotificationListener listener = UserNotificationListener.Current;
+        private static readonly Config.AppConfig config = new Config.AppConfig();
 
-        static void Listener_NotificationChanged(UserNotificationListener sender, UserNotificationChangedEventArgs args)
+        static async void Listener_NotificationChanged(UserNotificationListener sender, UserNotificationChangedEventArgs args)
         {
-            ConsoleProxy.WriteLine(null, ConsoleColor.Yellow, $"Notification arrived id - {args.UserNotificationId}");
+            var userNotifications = await GetNotifications(sender);
 
-            var userNotifications = GetNotifications(listener).Result;
             foreach (UserNotification userNotification in userNotifications)
             {
                 if (userNotification.Id == args.UserNotificationId)
                 {
-                    PrintNotification(userNotification);
+                    ConsoleProxy.WriteLine(null, ConsoleColor.Yellow, $"Notification arrived id - {args.UserNotificationId}");
+                    await ProcessNotification(userNotification);
                 }
             }
         }
 
         static void Main(string[] args)
         {
-            Console.OutputEncoding = System.Text.Encoding.UTF8;
+            Console.OutputEncoding = Encoding.Unicode;
 
-            //UserNotificationListener listener = UserNotificationListener.Current;
             listener.NotificationChanged += Listener_NotificationChanged;
 
             if (RequestAccess(listener).Result)
@@ -41,32 +42,28 @@ namespace Listener
 
                 foreach (UserNotification userNotification in userNotifications)
                 {
-                    PrintNotification(userNotification);
+                    ProcessNotification(userNotification).Wait();
                 }
             }
 
             Console.ReadLine();
         }
 
-        static void PrintNotification(UserNotification userNotification)
+        static async Task ProcessNotification(UserNotification userNotification)
         {
-            string titleText = "", bodyText = "";
-            NotificationBinding toastBinding = userNotification.Notification.Visual.GetBinding(KnownNotificationBindings.ToastGeneric);
+            var request = Helpers.GetRequest(userNotification);
 
-            if (toastBinding != null)
+            if (!config.App.Dryrun && Helpers.IsValid(request))
             {
-                IReadOnlyList<AdaptiveNotificationText> textElements = toastBinding.GetTextElements();
-                titleText = textElements.FirstOrDefault()?.Text;
-                bodyText = string.Join("\n", textElements.Skip(1).Select(t => t.Text));
-            }
+                var client = new HttpClient { BaseAddress = new Uri(config.Server.Url) };
+                var content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");
+                var result = await client.PostAsync("chance", content);
 
-            ConsoleProxy.WriteLine(null, ConsoleColor.DarkGray, $"userNotification.Id: ", $"{userNotification.Id}");
-            ConsoleProxy.WriteLine(null, ConsoleColor.DarkGray, $"CreationTime: ", $"{userNotification.CreationTime}");
-            ConsoleProxy.WriteLine(null, ConsoleColor.DarkGray, $"Description: ", $"{userNotification.AppInfo.DisplayInfo.Description}");
-            ConsoleProxy.WriteLine(null, ConsoleColor.DarkGray, $"DisplayName: ", $"{userNotification.AppInfo.DisplayInfo.DisplayName}");
-            ConsoleProxy.WriteLine(null, ConsoleColor.DarkGray, $"titleText: ", $"{titleText}");
-            ConsoleProxy.WriteLine(null, ConsoleColor.DarkGray, $"bodyText: ", $"{bodyText}");
-            Console.WriteLine();
+                if (result.StatusCode != System.Net.HttpStatusCode.OK)
+                {
+                    ConsoleProxy.WriteLine(null, ConsoleColor.DarkRed, $"Error! HttpStatus is: {result.StatusCode}");
+                }
+            }
         }
 
         static async Task<IReadOnlyList<UserNotification>> GetNotifications(UserNotificationListener listener)
