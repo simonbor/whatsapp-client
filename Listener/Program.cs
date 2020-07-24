@@ -9,6 +9,7 @@ using Windows.UI.Notifications;
 using Windows.UI.Notifications.Management;
 
 // https://blog.pieeatingninjas.be/2018/04/05/creating-a-uwp-console-app-in-c/
+// https://docs.microsoft.com/en-us/windows/uwp/design/shell/tiles-and-notifications/notification-listener
 namespace Listener
 {
     class Program
