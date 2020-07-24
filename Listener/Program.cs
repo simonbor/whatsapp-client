@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Listener.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -25,8 +26,13 @@ namespace Listener
             {
                 if (userNotification.Id == args.UserNotificationId)
                 {
+                    var waNotification = new WaNotification(userNotification);
+
                     ConsoleProxy.WriteLine(null, ConsoleColor.Yellow, $"Notification arrived id - {args.UserNotificationId}");
-                    await ProcessNotification(userNotification);
+                    if (!config.App.Dryrun && Helpers.IsValid(waNotification))
+                    {
+                        await ProcessNotification(waNotification);
+                    }
                 }
             }
         }
@@ -35,35 +41,39 @@ namespace Listener
         {
             Console.OutputEncoding = Encoding.Unicode;
 
-            listener.NotificationChanged += Listener_NotificationChanged;
-
+            // check for exists notifications
+            ConsoleProxy.WriteLine(null, ConsoleColor.Gray, "Check for exists notifications");
             if (RequestAccess(listener).Result)
             {
                 var userNotifications = GetNotifications(listener).Result;
 
                 foreach (UserNotification userNotification in userNotifications)
                 {
-                    ProcessNotification(userNotification).Wait();
+                    var waNotification = new WaNotification(userNotification);
+                    if (!config.App.Dryrun && Helpers.IsValid(waNotification))
+                    {
+                        ProcessNotification(waNotification).Wait();
+                    }
                 }
             }
+
+            // wait for new notifications
+            ConsoleProxy.WriteLine(null, ConsoleColor.Gray, "\nWaiting for new norifications...");
+            listener.NotificationChanged += Listener_NotificationChanged;
 
             Console.ReadLine();
         }
 
-        static async Task ProcessNotification(UserNotification userNotification)
+        static async Task ProcessNotification(WaNotification waNotification)
         {
-            var request = Helpers.GetRequest(userNotification);
+            var request = Helpers.GetRequest(waNotification);
+            var client = new HttpClient { BaseAddress = new Uri(config.Server.Url) };
+            var content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");            
+            var result = await client.PostAsync("chance", content);
 
-            if (!config.App.Dryrun && Helpers.IsValid(request))
+            if (result.StatusCode != System.Net.HttpStatusCode.OK)
             {
-                var client = new HttpClient { BaseAddress = new Uri(config.Server.Url) };
-                var content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");
-                var result = await client.PostAsync("chance", content);
-
-                if (result.StatusCode != System.Net.HttpStatusCode.OK)
-                {
-                    ConsoleProxy.WriteLine(null, ConsoleColor.DarkRed, $"Error! HttpStatus is: {result.StatusCode}");
-                }
+                ConsoleProxy.WriteLine(null, ConsoleColor.DarkRed, $"Error! HttpStatus is: {result.StatusCode}");
             }
         }
 

@@ -1,55 +1,62 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Listener.Models;
+using System;
 using System.Linq;
-using Windows.UI.Notifications;
 
 namespace Listener
 {
     public static class Helpers
     {
-        public static Models.ChanceReq GetRequest(UserNotification userNotification)
+        public static Models.ChanceReq GetRequest(WaNotification waNotification)
         {
-            string titleText = "", bodyText = "";
-            NotificationBinding toastBinding = userNotification.Notification.Visual.GetBinding(KnownNotificationBindings.ToastGeneric);
-
-            if (toastBinding != null)
-            {
-                IReadOnlyList<AdaptiveNotificationText> textElements = toastBinding.GetTextElements();
-                titleText = textElements.FirstOrDefault()?.Text;
-                bodyText = string.Join("\n", textElements.Skip(1).Select(t => t.Text));
-            }
-
-            ConsoleProxy.WriteLine(null, ConsoleColor.DarkGray, $"userNotification.Id: ", $"{userNotification.Id}");
-            ConsoleProxy.WriteLine(null, ConsoleColor.DarkGray, $"CreationTime: ", $"{userNotification.CreationTime}");
-            ConsoleProxy.WriteLine(null, ConsoleColor.DarkGray, $"Description: ", $"{userNotification.AppInfo.DisplayInfo.Description}");
-            ConsoleProxy.WriteLine(null, ConsoleColor.DarkGray, $"DisplayName: ", $"{userNotification.AppInfo.DisplayInfo.DisplayName}");
-            ConsoleProxy.WriteLine(null, ConsoleColor.DarkGray, $"titleText: ", $"{titleText}");
-            ConsoleProxy.WriteLine(null, ConsoleColor.DarkGray, $"bodyText: ", $"{bodyText}");
+            ConsoleProxy.WriteLine(null, ConsoleColor.DarkGray, $"userNotification.Id: ", $"{waNotification.Id}");
+            ConsoleProxy.WriteLine(null, ConsoleColor.DarkGray, $"CreationTime: ", $"{waNotification.CreationTime}");
+            ConsoleProxy.WriteLine(null, ConsoleColor.DarkGray, $"Description: ", $"{waNotification.Description}");
+            ConsoleProxy.WriteLine(null, ConsoleColor.DarkGray, $"DisplayName: ", $"{waNotification.DisplayName}");
+            ConsoleProxy.WriteLine(null, ConsoleColor.DarkGray, $"titleText: ", $"{waNotification.TitleText}");
+            ConsoleProxy.WriteLine(null, ConsoleColor.DarkGray, $"bodyText: ", $"{waNotification.BodyText}");
             Console.WriteLine();
 
             return new Models.ChanceReq
             {
                 Address = new Models.Address
                 {
-                    StreetLocalName = bodyText,
+                    StreetLocalName = waNotification.BodyText,
                     Building = -1,
                     CityId = 1,
                     CountryId = 367
                 },
                 Driver = new Models.Driver
                 {
-                    MobileNum = bodyText.Split(':')[0]
+                    MobileNum = waNotification.BodyText.Split(':')[0]
                 },
                 Chance = new Models.Chance
                 {
-                    DateStart = userNotification.CreationTime.UtcDateTime.ToString()
+                    DateStart = waNotification.CreationTime.UtcDateTime.ToString()
                 }
             };
         }
 
-        public static bool IsValid(Models.ChanceReq request)
+        public static bool IsValid(WaNotification waNotification)
         {
-            // ...
+            var config = new Config.AppConfig();
+
+            // whether the app is Chrome
+            if (waNotification.DisplayName != "Google Chrome")
+            {
+                return false;
+            }
+
+            // where the group is parking group
+            if (!config.Whatsapp.Groups.Exists(group => group == waNotification.TitleText))
+            {
+                return false;
+            }
+
+            // where the body contain address
+            if (!waNotification.BodyText.Any(char.IsDigit))
+            {
+                return false;
+            }
 
             return true;
         }
