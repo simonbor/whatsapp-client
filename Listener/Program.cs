@@ -29,7 +29,7 @@ namespace Listener
                     var waNotification = new WaNotification(userNotification);
 
                     ConsoleProxy.WriteLine(null, ConsoleColor.Yellow, $"Notification arrived id - {args.UserNotificationId}");
-                    if (!config.App.Dryrun && Helpers.IsValid(waNotification))
+                    if (Helpers.IsValid(waNotification))
                     {
                         await ProcessNotification(waNotification);
                     }
@@ -50,7 +50,7 @@ namespace Listener
                 foreach (UserNotification userNotification in userNotifications)
                 {
                     var waNotification = new WaNotification(userNotification);
-                    if (!config.App.Dryrun && Helpers.IsValid(waNotification))
+                    if (Helpers.IsValid(waNotification))
                     {
                         ProcessNotification(waNotification).Wait();
                     }
@@ -68,12 +68,16 @@ namespace Listener
         {
             var request = Helpers.GetRequest(waNotification);
             var client = new HttpClient { BaseAddress = new Uri(config.Server.Url) };
-            var content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");            
-            var result = await client.PostAsync("chance", content);
+            var content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");
 
-            if (result.StatusCode != System.Net.HttpStatusCode.OK)
+            if (!config.App.Dryrun)
             {
-                ConsoleProxy.WriteLine(null, ConsoleColor.DarkRed, $"Error! HttpStatus is: {result.StatusCode}");
+                var result = await client.PostAsync("chance", content);
+
+                if (result.StatusCode != System.Net.HttpStatusCode.OK)
+                {
+                    ConsoleProxy.WriteLine(null, ConsoleColor.DarkRed, $"Error! HttpStatus is: {result.StatusCode}");
+                }
             }
         }
 

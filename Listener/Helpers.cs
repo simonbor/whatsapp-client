@@ -47,13 +47,13 @@ namespace Listener
             }
 
             // where the group is parking group
-            if (!config.Whatsapp.Groups.Exists(group => group == waNotification.TitleText))
+            if (!config.Whatsapp.Groups.Exists(group => waNotification.TitleText.Contains(group, StringComparison.OrdinalIgnoreCase)))
             {
                 return false;
             }
 
             // where the body contain address
-            if (!waNotification.BodyText.Any(char.IsDigit))
+            if (!waNotification.BodyText.Split(':')[1].Any(char.IsDigit))
             {
                 return false;
             }
