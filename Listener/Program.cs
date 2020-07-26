@@ -28,7 +28,8 @@ namespace Listener
                 {
                     var waNotification = new WaNotification(userNotification);
 
-                    ConsoleProxy.WriteLine(null, ConsoleColor.Yellow, $"Notification arrived id - {args.UserNotificationId}");
+                    ConsoleProxy.WriteLine(null, ConsoleColor.Yellow, $"Notification arrived " +
+                        $"at: {DateTime.Now.ToLocalTime().ToShortTimeString()} id: {args.UserNotificationId}");
                     if (Helpers.IsValid(waNotification))
                     {
                         await ProcessNotification(waNotification);
