@@ -1,6 +1,7 @@
 ﻿using Listener.Models;
 using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Listener
 {
@@ -16,12 +17,15 @@ namespace Listener
             ConsoleProxy.WriteLine(null, ConsoleColor.DarkGray, $"bodyText: ", $"{waNotification.BodyText}");
             Console.WriteLine();
 
+            var bodyText = waNotification.BodyText.Split(':')[1];
+            var building = Regex.Match(bodyText, @"\d+").Value;
+
             return new Models.ChanceReq
             {
                 Address = new Models.Address
                 {
-                    StreetLocalName = waNotification.BodyText,
-                    Building = -1,
+                    StreetName = bodyText,
+                    Building = int.Parse(building),
                     CityId = 1,
                     CountryId = 367
                 },
