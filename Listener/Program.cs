@@ -77,7 +77,7 @@ namespace Listener
 
                 if (result.StatusCode != System.Net.HttpStatusCode.OK)
                 {
-                    ConsoleProxy.WriteLine(null, ConsoleColor.DarkRed, $"Error! HttpStatus is: {result.StatusCode}");
+                    ConsoleProxy.WriteLine(null, ConsoleColor.DarkRed, $"Error has ocurred while sending WA notification: {waNotification.Id.ToString()}, HttpStatus is: {result.StatusCode}");
                 }
             }
         }
