@@ -9,6 +9,7 @@ namespace Listener
     {
         public static Models.ChanceReq GetRequest(WaNotification waNotification)
         {
+            Console.WriteLine();
             ConsoleProxy.WriteLine(null, ConsoleColor.DarkGray, $"userNotification.Id: ", $"{waNotification.Id}");
             ConsoleProxy.WriteLine(null, ConsoleColor.DarkGray, $"CreationTime: ", $"{waNotification.CreationTime}");
             ConsoleProxy.WriteLine(null, ConsoleColor.DarkGray, $"Description: ", $"{waNotification.Description}");
@@ -17,21 +18,19 @@ namespace Listener
             ConsoleProxy.WriteLine(null, ConsoleColor.DarkGray, $"bodyText: ", $"{waNotification.BodyText}");
             Console.WriteLine();
 
-            var bodyText = waNotification.BodyText.Split(':')[1];
-            var building = Regex.Match(bodyText, @"\d+").Value;
+            var bodyText = waNotification.BodyText.Split(':')[1].Trim();
 
             return new Models.ChanceReq
             {
                 Address = new Models.Address
                 {
-                    StreetName = bodyText,
-                    Building = int.Parse(building),
+                    Text = bodyText,
                     CityId = 1,
                     CountryId = 367
                 },
                 Driver = new Models.Driver
                 {
-                    MobileNum = waNotification.BodyText.Split(':')[0]
+                    MobileNum = waNotification.BodyText.Split(':')[0].Trim()
                 },
                 Chance = new Models.Chance
                 {
@@ -47,18 +46,24 @@ namespace Listener
             // whether the app is Chrome
             if (waNotification.DisplayName != "Google Chrome")
             {
+                ConsoleProxy.WriteLine(null, ConsoleColor.DarkGray, 
+                    $"{waNotification.Id} Wrong application name ({waNotification.DisplayName})");
                 return false;
             }
 
             // where the group is parking group
             if (!config.Whatsapp.Groups.Exists(group => waNotification.TitleText.Contains(group, StringComparison.OrdinalIgnoreCase)))
             {
+                ConsoleProxy.WriteLine(null, ConsoleColor.DarkGray,
+                    $"{waNotification.Id} Wrong groupName ({waNotification.TitleText})");
                 return false;
             }
 
             // where the body contain address
             if (!waNotification.BodyText.Split(':')[1].Any(char.IsDigit))
             {
+                ConsoleProxy.WriteLine(null, ConsoleColor.DarkGray,
+                    $"{waNotification.Id} Wrong address ({waNotification.BodyText.Split(':')[1].Trim()})");
                 return false;
             }
 
