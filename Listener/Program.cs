@@ -20,7 +20,7 @@ namespace Listener
 
         static async void Listener_NotificationChanged(UserNotificationListener sender, UserNotificationChangedEventArgs args)
         {
-            var userNotifications = await GetNotifications(sender);
+            var userNotifications = await sender.GetNotificationsAsync(NotificationKinds.Toast);
 
             foreach (UserNotification userNotification in userNotifications)
             {
@@ -29,7 +29,7 @@ namespace Listener
                     var waNotification = new WaNotification(userNotification);
 
                     ConsoleProxy.WriteLine(null, ConsoleColor.Yellow, $"Notification arrived " +
-                        $"at: {DateTime.Now.ToLocalTime().ToShortTimeString()} id: {args.UserNotificationId}");
+                        $"at: {DateTime.Now.ToLocalTime().ToShortTimeString()}, id: {args.UserNotificationId}");
                     if (Helpers.IsValid(waNotification))
                     {
                         await ProcessNotification(waNotification);
@@ -84,7 +84,7 @@ namespace Listener
 
         static async Task<IReadOnlyList<UserNotification>> GetNotifications(UserNotificationListener listener)
         {
-            // Get all the current notifications from the platform
+            // Get all notifications from the platform
             return await listener.GetNotificationsAsync(NotificationKinds.Toast);
         }
 
