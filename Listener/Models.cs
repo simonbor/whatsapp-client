@@ -7,10 +7,9 @@ namespace Listener.Models
 {
     public class Address
     {
-        public string StreetName { get; set; }
+        public string Text { get; set; }
         public int CityId { get; set; }
         public int CountryId { get; set; }
-        public int Building { get; set; }
     }
 
     public class Driver
