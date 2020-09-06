@@ -1,7 +1,6 @@
 ﻿using Listener.Models;
 using System;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace Listener
 {
@@ -18,7 +17,8 @@ namespace Listener
             ConsoleProxy.WriteLine(null, ConsoleColor.DarkGray, $"bodyText: ", $"{waNotification.BodyText}");
             Console.WriteLine();
 
-            var bodyText = waNotification.BodyText.Split(':')[1].Trim();
+            var cellPhoneLength = waNotification.BodyText.Split(':')[0].Length;
+            var bodyText = waNotification.BodyText.Substring(cellPhoneLength + 1).Trim();
 
             return new Models.ChanceReq
             {
@@ -42,6 +42,8 @@ namespace Listener
         public static bool IsValid(WaNotification waNotification)
         {
             var config = new Config.AppConfig();
+            var cellPhoneLength = waNotification.BodyText.Split(':')[0].Length;
+            var bodyText = waNotification.BodyText.Substring(cellPhoneLength + 1).Trim();
 
             // whether the app is Chrome
             if (waNotification.DisplayName != "Google Chrome")
@@ -59,11 +61,11 @@ namespace Listener
                 return false;
             }
 
-            // where the body contain address
-            if (!waNotification.BodyText.Split(':')[1].Any(char.IsDigit))
+            // where the body contains address
+            if (!bodyText.Any(char.IsDigit))
             {
                 ConsoleProxy.WriteLine(null, ConsoleColor.DarkGray,
-                    $"{waNotification.Id} Wrong address ({waNotification.BodyText.Split(':')[1].Trim()})");
+                    $"{waNotification.Id} Wrong address ({bodyText})");
                 return false;
             }
 
