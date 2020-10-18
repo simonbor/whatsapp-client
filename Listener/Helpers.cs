@@ -41,10 +41,6 @@ namespace Listener
 
         public static bool IsValid(WaNotification waNotification)
         {
-            var config = new Config.AppConfig();
-            var cellPhoneLength = waNotification.BodyText.Split(':')[0].Length;
-            var bodyText = waNotification.BodyText.Substring(cellPhoneLength + 1).Trim();
-
             // whether the app is Chrome
             if (waNotification.DisplayName != "Google Chrome")
             {
@@ -54,10 +50,21 @@ namespace Listener
             }
 
             // where the group is parking group
+            var config = new Config.AppConfig();
             if (!config.Whatsapp.Groups.Exists(group => waNotification.TitleText.Contains(group, StringComparison.OrdinalIgnoreCase)))
             {
                 ConsoleProxy.WriteLine(null, ConsoleColor.DarkGray,
                     $"{waNotification.Id} Wrong groupName ({waNotification.TitleText})");
+                return false;
+            }
+
+            // where the body text is enouth length - street name, space and house number ~ 4
+            var cellPhoneLength = waNotification.BodyText.Split(':')[0].Length;
+            var bodyText = waNotification.BodyText.Substring(cellPhoneLength + 1).Trim();
+            if(bodyText.Length<4)
+            {
+                ConsoleProxy.WriteLine(null, ConsoleColor.DarkGray,
+                    $"{waNotification.Id} address string is too short ({bodyText})");
                 return false;
             }
 
