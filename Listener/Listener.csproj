@@ -134,6 +134,7 @@
     <Compile Include="ConsoleProxy.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="Models.cs" />
+    <Compile Include="NotificationHandler.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
