@@ -28,6 +28,12 @@ namespace Listener.Models
         public Driver Driver { get; set; }
         public Chance Chance { get; set; }
     }
+    public class ChanceRes
+    {
+        public Chance Data { get; set; }
+        public int StatusCode { get; set; }
+        public string StatusText { get; set; }
+    }
 
     public class WaNotification
     {
@@ -58,4 +64,5 @@ namespace Listener.Models
             this.BodyText = bodyText;
         }
     }
+
 }
