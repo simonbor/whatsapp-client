@@ -2,6 +2,8 @@
 {
     public class App
     {
-        public bool Dryrun { get; set; }
+        public bool DryRun { get; set; }
+        public bool CheckForNotificationPeriodically { get; set; }
+        public int CheckForNotificationPeriod { get; set; }
     }
 }
