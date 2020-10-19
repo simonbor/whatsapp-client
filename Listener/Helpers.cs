@@ -42,7 +42,7 @@ namespace Listener
         public static bool IsValid(WaNotification waNotification)
         {
             // whether the app is Chrome
-            if (waNotification.DisplayName != "Google Chrome")
+            if (waNotification.DisplayName != "Google Chrome" && waNotification.DisplayName != "Microsoft Edge")
             {
                 ConsoleProxy.WriteLine(null, ConsoleColor.DarkGray, 
                     $"{waNotification.Id} Wrong application name ({waNotification.DisplayName})");
@@ -59,17 +59,10 @@ namespace Listener
             }
 
             // where the body text is enouth length - street name, space and house number ~ 4
+            // and where the body contains address
             var cellPhoneLength = waNotification.BodyText.Split(':')[0].Length;
             var bodyText = waNotification.BodyText.Substring(cellPhoneLength + 1).Trim();
-            if(bodyText.Length<4)
-            {
-                ConsoleProxy.WriteLine(null, ConsoleColor.DarkGray,
-                    $"{waNotification.Id} address string is too short ({bodyText})");
-                return false;
-            }
-
-            // where the body contains address
-            if (!bodyText.Any(char.IsDigit))
+            if((bodyText.Length < 4) || !bodyText.Any(char.IsDigit))
             {
                 ConsoleProxy.WriteLine(null, ConsoleColor.DarkGray,
                     $"{waNotification.Id} Wrong address ({bodyText})");
