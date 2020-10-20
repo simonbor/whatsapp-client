@@ -41,8 +41,8 @@ namespace Listener
 
         public static bool IsValid(WaNotification waNotification)
         {
-            // whether the app is Chrome
-            if (waNotification.DisplayName != "Google Chrome" && waNotification.DisplayName != "Microsoft Edge")
+            // whether the app is Chrome only! "Microsoft Edge" creates notifications with other DateTime format
+            if (waNotification.DisplayName != "Google Chrome")
             {
                 ConsoleProxy.WriteLine(null, ConsoleColor.DarkGray, 
                     $"{waNotification.Id} Wrong application name ({waNotification.DisplayName})");
