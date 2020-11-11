@@ -34,7 +34,7 @@ namespace Listener
                 },
                 Chance = new Models.Chance
                 {
-                    DateStart = waNotification.CreationTime.UtcDateTime.ToString()
+                    DateStart = waNotification.CreationTime.ToString()
                 }
             };
         }
