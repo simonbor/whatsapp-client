@@ -12,7 +12,7 @@
   <Identity
     Name="f2e35752-8dc4-4652-af78-4e4b6ed74785"
     Publisher="CN=Simon"
-    Version="1.0.28.0" />
+    Version="1.0.32.0" />
 
   <mp:PhoneIdentity PhoneProductId="f2e35752-8dc4-4652-af78-4e4b6ed74785" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
