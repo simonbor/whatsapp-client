@@ -30,7 +30,7 @@ namespace Listener.Models
     }
     public class ChanceRes
     {
-        public Chance Data { get; set; }
+        public Chance[] Data { get; set; }
         public int StatusCode { get; set; }
         public string StatusText { get; set; }
     }
