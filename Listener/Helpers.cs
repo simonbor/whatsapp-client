@@ -6,6 +6,15 @@ namespace Listener
 {
     public static class Helpers
     {
+        // clean WA message from rest unicode symbols - &#8235, &#8206, &#8236
+        private static string CleanString(string payLoad)
+        {
+            return payLoad
+                .Trim((char)(8235))     // trim RIGHT-TO-LEFT EMBEDDING
+                .Trim((char)(8206))     // trim LEFT-TO-RIGHT MARK
+                .Trim((char)(8236));    // trim POP DIRECTIONAL FORMATTING
+        }
+
         public static Models.ChanceReq GetRequest(WaNotification waNotification)
         {
             Console.WriteLine();
@@ -17,20 +26,20 @@ namespace Listener
             ConsoleProxy.WriteLine(null, ConsoleColor.DarkGray, $"bodyText: ", $"{waNotification.BodyText}");
             Console.WriteLine();
 
-            var cellPhoneLength = waNotification.BodyText.Split(':')[0].Length;
-            var bodyText = waNotification.BodyText.Substring(cellPhoneLength + 1).Trim();
+            var cellPhone = waNotification.BodyText.Split(':')[0].Trim();
+            var bodyText = waNotification.BodyText.Substring(cellPhone.Length + 1).Trim();
 
             return new Models.ChanceReq
             {
                 Address = new Models.Address
                 {
-                    Text = bodyText,
+                    Text = CleanString(bodyText),
                     CityId = 1,
                     CountryId = 367
                 },
                 Driver = new Models.Driver
                 {
-                    MobileNum = waNotification.BodyText.Split(':')[0].Trim()
+                    MobileNum = CleanString(cellPhone)
                 },
                 Chance = new Models.Chance
                 {
