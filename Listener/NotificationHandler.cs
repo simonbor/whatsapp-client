@@ -73,6 +73,10 @@ namespace Listener
                     }
                 }
             }
+            catch (Exception e)
+            {
+                ConsoleProxy.WriteLine(null, ConsoleColor.DarkRed, e.Message);
+            }
             finally
             {
                 semaphoreSlim.Release();
