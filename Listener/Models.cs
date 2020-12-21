@@ -12,6 +12,11 @@ namespace Listener.Models
         public int CountryId { get; set; }
     }
 
+    public class WhatsApp
+    {
+        public string GroupName { get; set; }
+    }
+
     public class Driver
     {
         public string MobileNum { get; set; }
@@ -27,6 +32,7 @@ namespace Listener.Models
         public Address Address { get; set; }
         public Driver Driver { get; set; }
         public Chance Chance { get; set; }
+        public WhatsApp WhatsApp { get; set; }
     }
     public class ChanceRes
     {

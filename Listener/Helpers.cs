@@ -22,8 +22,8 @@ namespace Listener
             ConsoleProxy.WriteLine(null, ConsoleColor.DarkGray, $"CreationTime: ", $"{waNotification.CreationTime}");
             ConsoleProxy.WriteLine(null, ConsoleColor.DarkGray, $"Description: ", $"{waNotification.Description}");
             ConsoleProxy.WriteLine(null, ConsoleColor.DarkGray, $"DisplayName: ", $"{waNotification.DisplayName}");
-            ConsoleProxy.WriteLine(null, ConsoleColor.DarkGray, $"titleText: ", $"{waNotification.TitleText}");
-            ConsoleProxy.WriteLine(null, ConsoleColor.DarkGray, $"bodyText: ", $"{waNotification.BodyText}");
+            ConsoleProxy.WriteLine(null, ConsoleColor.DarkGray, $"TitleText: ", $"{waNotification.TitleText}");
+            ConsoleProxy.WriteLine(null, ConsoleColor.DarkGray, $"BodyText: ", $"{waNotification.BodyText}");
             Console.WriteLine();
 
             var cellPhone = waNotification.BodyText.Split(':')[0].Trim();
@@ -40,6 +40,10 @@ namespace Listener
                 Driver = new Models.Driver
                 {
                     MobileNum = CleanString(cellPhone)
+                },
+                WhatsApp = new WhatsApp
+                {
+                    GroupName = CleanString(waNotification.TitleText)
                 },
                 Chance = new Models.Chance
                 {
